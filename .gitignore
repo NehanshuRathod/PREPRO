@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+data/events.jsonl
+data/scores.jsonl
+data/models/
+

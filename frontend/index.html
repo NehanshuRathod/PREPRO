@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Unknown World Explorer</title>
+    <link rel="stylesheet" href="/app.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="game-panel" aria-label="Behavioral assessment game">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Behavioral Assessment Game</p>
+            <h1>Unknown World Explorer</h1>
+          </div>
+          <div class="status">
+            <span id="serverStatus">Checking server</span>
+            <strong id="stageLabel">Stage 1 / 4</strong>
+          </div>
+        </header>
+
+        <div class="progress" aria-hidden="true">
+          <span id="progressFill"></span>
+        </div>
+
+        <section id="stage" class="stage"></section>
+      </section>
+
+      <aside class="dashboard" aria-label="Assessment dashboard">
+        <div class="dashboard-header">
+          <p class="eyebrow">Live Dashboard</p>
+          <h2>Trait Scores</h2>
+        </div>
+
+        <canvas id="radar" width="420" height="300" aria-label="Trait radar chart"></canvas>
+
+        <div id="scoreList" class="score-list">
+          <p class="empty">Complete the expedition to reveal scores.</p>
+        </div>
+
+        <div class="insights">
+          <h3>Behavioral Insights</h3>
+          <ul id="insightList">
+            <li>Actions are logged locally during play.</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
+
