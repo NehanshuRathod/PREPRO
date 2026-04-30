@@ -11,12 +11,12 @@
       <section class="game-panel" aria-label="Behavioral assessment game">
         <header class="topbar">
           <div>
-            <p class="eyebrow">Behavioral Assessment Game</p>
+            <p class="eyebrow">AI Behavioral Lab</p>
             <h1>Unknown World Explorer</h1>
           </div>
           <div class="status">
             <span id="serverStatus">Checking server</span>
-            <strong id="stageLabel">Stage 1 / 4</strong>
+            <strong id="stageLabel">Stage 1 / 5</strong>
           </div>
         </header>
 
@@ -29,20 +29,37 @@
 
       <aside class="dashboard" aria-label="Assessment dashboard">
         <div class="dashboard-header">
-          <p class="eyebrow">Live Dashboard</p>
-          <h2>Trait Scores</h2>
+          <p class="eyebrow">Final Output</p>
+          <h2>Behavioral Signature</h2>
+        </div>
+
+        <div id="profileBox" class="profile-box">
+          <strong>Awaiting session</strong>
+          <span>Play through the expedition to generate an evidence-backed report.</span>
         </div>
 
         <canvas id="radar" width="420" height="300" aria-label="Trait radar chart"></canvas>
 
         <div id="scoreList" class="score-list">
-          <p class="empty">Complete the expedition to reveal scores.</p>
+          <p class="empty">Scores appear after the final gate.</p>
         </div>
 
         <div class="insights">
-          <h3>Behavioral Insights</h3>
+          <h3>Evidence</h3>
+          <div id="evidenceList" class="metric-grid"></div>
+        </div>
+
+        <div class="insights">
+          <h3>Conclusion</h3>
           <ul id="insightList">
-            <li>Actions are logged locally during play.</li>
+            <li>The model is waiting for behavioral data.</li>
+          </ul>
+        </div>
+
+        <div class="insights">
+          <h3>Recommendations</h3>
+          <ul id="recommendationList">
+            <li>Complete a run to generate next-step guidance.</li>
           </ul>
         </div>
       </aside>
@@ -51,4 +68,3 @@
     <script src="/app.js"></script>
   </body>
 </html>
-

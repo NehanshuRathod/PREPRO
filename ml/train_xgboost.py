@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import joblib
@@ -16,12 +17,20 @@ MODEL_DIR = ROOT / "data" / "models"
 FEATURES = [
     "avg_decision_time",
     "hint_count",
+    "hint_dependency",
     "risk_ratio",
     "exploration_score",
     "retry_rate",
     "puzzle_success_rate",
     "hidden_discovery_ratio",
     "choice_count",
+    "confidence_wager_avg",
+    "confidence_wager_variance",
+    "resource_efficiency",
+    "recovery_index",
+    "pattern_switch_rate",
+    "information_gain",
+    "event_count",
 ]
 
 TRAITS = ["confidence", "curiosity", "emotional_safety", "exploratory_power"]
@@ -39,13 +48,15 @@ def main() -> None:
         frame[FEATURES], frame[TRAITS], test_size=0.2, random_state=42
     )
 
+    metrics = {}
     for trait in TRAITS:
         model = XGBRegressor(
-            n_estimators=140,
+            n_estimators=220,
             max_depth=4,
-            learning_rate=0.06,
-            subsample=0.9,
+            learning_rate=0.045,
+            subsample=0.92,
             colsample_bytree=0.9,
+            reg_lambda=1.2,
             objective="reg:squarederror",
             random_state=42,
         )
@@ -54,11 +65,12 @@ def main() -> None:
         mse = mean_squared_error(y_test[trait], predictions)
         r2 = r2_score(y_test[trait], predictions)
         joblib.dump(model, MODEL_DIR / f"{trait}.joblib")
+        metrics[trait] = {"mse": round(mse, 3), "r2": round(r2, 3)}
         print(f"{trait}: MSE={mse:.3f} R2={r2:.3f}")
 
+    (MODEL_DIR / "metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
     print(f"Models saved to {MODEL_DIR}")
 
 
 if __name__ == "__main__":
     main()
-
