@@ -13,7 +13,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.feature_engineering import engineer_features
+from backend.gemini import gemini_available, generate_scenario
 from backend.model import BehavioralModel, write_jsonl
+from backend.question_bank import enrich_events, question_payload
 
 
 FRONTEND_DIR = ROOT / "frontend"
@@ -32,15 +34,29 @@ class AppHandler(BaseHTTPRequestHandler):
                 {
                     "ok": True,
                     "model_mode": MODEL.mode,
+                    "gemini_available": gemini_available(),
                     "message": "Behavioral assessment server is running.",
                 }
             )
+            return
+
+        if parsed.path == "/api/questions":
+            self._send_json(question_payload(count=20))
             return
 
         self._serve_static(parsed.path)
 
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
+
+        if parsed.path == "/api/gemini-scenario":
+            try:
+                payload = self._read_json()
+                scenario = generate_scenario(str(payload.get("profile_hint", "balanced")))
+                self._send_json({"ok": True, "scenario": scenario})
+            except Exception as exc:
+                self._send_json({"ok": False, "error": str(exc)}, status=400)
+            return
 
         if parsed.path != "/api/score":
             self._send_json({"error": "Not found"}, status=404)
@@ -53,7 +69,8 @@ class AppHandler(BaseHTTPRequestHandler):
                 raise ValueError("events must be a list")
 
             user_id = str(payload.get("user_id") or f"user-{int(time.time())}")
-            features = engineer_features(events)
+            enriched_events = enrich_events(events)
+            features = engineer_features(enriched_events)
             scoring = MODEL.score(features)
             response = {
                 "user_id": user_id,
@@ -62,7 +79,7 @@ class AppHandler(BaseHTTPRequestHandler):
                 "created_at": int(time.time()),
             }
 
-            write_jsonl(DATA_DIR / "events.jsonl", {"user_id": user_id, "events": events})
+            write_jsonl(DATA_DIR / "events.jsonl", {"user_id": user_id, "events": enriched_events})
             write_jsonl(DATA_DIR / "scores.jsonl", response)
             self._send_json(response)
         except Exception as exc:
@@ -80,6 +97,8 @@ class AppHandler(BaseHTTPRequestHandler):
         content_type = mimetypes.guess_type(str(target))[0] or "application/octet-stream"
         self.send_response(200)
         self.send_header("Content-Type", content_type)
+        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+        self.send_header("Pragma", "no-cache")
         self.end_headers()
         self.wfile.write(target.read_bytes())
 
@@ -94,6 +113,7 @@ class AppHandler(BaseHTTPRequestHandler):
         body = json.dumps(payload, indent=2).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
+        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -113,4 +133,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

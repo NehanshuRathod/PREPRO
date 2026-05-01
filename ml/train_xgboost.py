@@ -16,20 +16,20 @@ MODEL_DIR = ROOT / "data" / "models"
 
 FEATURES = [
     "avg_decision_time",
-    "hint_count",
-    "hint_dependency",
-    "risk_ratio",
+    "risk_score",
     "exploration_score",
-    "retry_rate",
-    "puzzle_success_rate",
-    "hidden_discovery_ratio",
-    "choice_count",
-    "confidence_wager_avg",
-    "confidence_wager_variance",
-    "resource_efficiency",
-    "recovery_index",
-    "pattern_switch_rate",
-    "information_gain",
+    "curiosity_score",
+    "information_score",
+    "time_pressure_efficiency",
+    "decision_consistency",
+    "decision_variance",
+    "risk_shift_over_time",
+    "hint_dependency_curve",
+    "exploration_depth",
+    "pressure_success_rate",
+    "option_entropy",
+    "timeout_rate",
+    "path_unlock_rate",
     "event_count",
 ]
 
@@ -38,9 +38,7 @@ TRAITS = ["confidence", "curiosity", "emotional_safety", "exploratory_power"]
 
 def main() -> None:
     if not DATASET.exists():
-        raise SystemExit(
-            "Dataset not found. Run: python scripts/generate_synthetic_data.py"
-        )
+        raise SystemExit("Dataset not found. Run: python scripts/generate_synthetic_data.py")
 
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
     frame = pd.read_csv(DATASET)
@@ -51,12 +49,12 @@ def main() -> None:
     metrics = {}
     for trait in TRAITS:
         model = XGBRegressor(
-            n_estimators=220,
-            max_depth=4,
-            learning_rate=0.045,
+            n_estimators=240,
+            max_depth=6,
+            learning_rate=0.06,
             subsample=0.92,
             colsample_bytree=0.9,
-            reg_lambda=1.2,
+            reg_lambda=1.15,
             objective="reg:squarederror",
             random_state=42,
         )
